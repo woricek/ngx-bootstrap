@@ -41,6 +41,7 @@ export class ModalContainerComponent implements OnInit, OnDestroy {
   bsModalService: BsModalService;
   private isModalHiding = false;
   private clickStartedInContent = false;
+  private clickStartedInScrollBar = false;
 
   constructor(options: ModalOptions,
               protected _element: ElementRef,
@@ -82,17 +83,19 @@ export class ModalContainerComponent implements OnInit, OnDestroy {
   @HostListener('mousedown', ['$event'])
   onClickStarted(event: MouseEvent): void {
     this.clickStartedInContent = event.target !== this._element.nativeElement;
+    this.clickStartedInScrollBar = event.clientX > this._element.nativeElement.clientWidth;
   }
 
   @HostListener('mouseup', ['$event'])
   onClickStop(event: MouseEvent): void {
-    const clickedInBackdrop = event.target === this._element.nativeElement && !this.clickStartedInContent;
+    const clickedInBackdrop = event.target === this._element.nativeElement && !this.clickStartedInContent && !this.clickStartedInScrollBar;
     if (
       this.config.ignoreBackdropClick ||
       this.config.backdrop === 'static' ||
       !clickedInBackdrop
     ) {
       this.clickStartedInContent = false;
+      this.clickStartedInScrollBar = false;
 
       return;
     }
